@@ -143,14 +143,10 @@ void main() {
         
         if (prob > 0.00001) {
             vec3 col = phaseToColor(phase);
-            float alpha = prob * uOpacity * 10.0; // Boost visibility
-            
-            // Premultiplied alpha blending
-            finalColor.rgb += (1.0 - finalColor.a) * col * alpha;
-            finalColor.a += (1.0 - finalColor.a) * alpha;
+            float alpha = prob * uOpacity * 20.0; // Higher boost
+            finalColor.rgb += col * alpha;
+            finalColor.a = 1.0;
         }
-        
-        if (finalColor.a >= 0.95) break;
         
         rayLocalPos += rayStep;
         

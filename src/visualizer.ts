@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { volumetricVert, volumetricFrag } from './shaders/volumetricShaders';
 
 export class WavefunctionVisualizer {
@@ -8,6 +9,7 @@ export class WavefunctionVisualizer {
     private material: THREE.ShaderMaterial;
     private mesh: THREE.Mesh;
     private clock: THREE.Clock;
+    private controls: OrbitControls;
 
     constructor(container: HTMLElement) {
         this.scene = new THREE.Scene();
@@ -20,6 +22,9 @@ export class WavefunctionVisualizer {
         this.renderer.setSize(container.clientWidth, container.clientHeight);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
 
         this.clock = new THREE.Clock();
 
@@ -77,6 +82,7 @@ export class WavefunctionVisualizer {
         this.material.uniforms.uTime.value = delta;
         this.material.uniforms.cameraPosition.value.copy(this.camera.position);
 
+        this.controls.update();
         this.renderer.render(this.scene, this.camera);
     }
 
