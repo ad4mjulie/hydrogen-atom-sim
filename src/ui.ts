@@ -50,7 +50,7 @@ export function setupUI(visualizer: any) {
     renderFolder.addBinding(params, 'scale', { min: 1.0, max: 50.0 });
     renderFolder.addBinding(params, 'stepSize', { min: 0.01, max: 0.2 });
 
-    pane.on('change', (ev) => {
+    (pane as any).on('change', (ev: any) => {
         visualizer.updateUniforms(params);
     });
 

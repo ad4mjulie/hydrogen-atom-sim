@@ -40,8 +40,3 @@ Due to the continuous nature of the electron cloud, standard polygonal rendering
 - **n, l, m**: Change the principal, azimuthal, and magnetic quantum numbers to see different orbital shapes.
 - **Scale**: Zoom in/out of the electron cloud.
 - **Opacity/StepSize**: Adjust rendering quality vs performance.
-
-## Extension Ideas
-- **Spin**: Add an extra spinor component and visualize the Stern-Gerlach effect.
-- **Fine Structure**: Implement relativistic corrections and spin-orbit coupling.
-- **Multi-electron**: Move to Helium or Lithium using approximate variational methods.

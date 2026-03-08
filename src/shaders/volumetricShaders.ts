@@ -132,17 +132,18 @@ void main() {
     // Back-to-front or front-to-back?
     // For simple additive blending, front-to-back is easier
     
-    for(int i = 0; i < 64; i++) {
-        // Exit if too far or internal
-        if (length(vLocalPosition) > 1.0) break;
+    vec3 rayStep = rayDir * uStepSize;
+    vec3 rayLocalPos = vLocalPosition;
+    
+    for(int i = 0; i < 128; i++) {
+        // Sample at current local position
+        vec2 psi = getWavefunction(rayLocalPos);
+        float prob = dot(psi, psi);
+        float phase = atan(psi.y, psi.x);
         
-        vec2 psi = getWavefunction(vLocalPosition);
-        float prob = Psi.x * Psi.x + Psi.y * Psi.y;
-        float phase = atan(Psi.y, Psi.x);
-        
-        if (prob > 0.0001) {
+        if (prob > 0.00001) {
             vec3 col = phaseToColor(phase);
-            float alpha = prob * uOpacity;
+            float alpha = prob * uOpacity * 10.0; // Boost visibility
             
             // Premultiplied alpha blending
             finalColor.rgb += (1.0 - finalColor.a) * col * alpha;
@@ -151,9 +152,10 @@ void main() {
         
         if (finalColor.a >= 0.95) break;
         
-        rayPos += rayDir * uStepSize;
-        // Need to update vLocalPosition... actually better to use world space or transform
-        // For now, let's assume a unit sphere bounding box
+        rayLocalPos += rayStep;
+        
+        // Exit if we leave the unit sphere
+        if (length(rayLocalPos) > 1.0) break;
     }
     
     gl_FragColor = finalColor;

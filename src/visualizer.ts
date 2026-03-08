@@ -29,15 +29,15 @@ export class WavefunctionVisualizer {
                 uN: { value: 1 },
                 uL: { value: 0 },
                 uM: { value: 0 },
-                uOpacity: { value: 0.5 },
-                uStepSize: { value: 0.05 },
-                uScale: { value: 10.0 },
-                cameraPosition: { value: this.camera.position }
+                uOpacity: { value: 0.8 },
+                uStepSize: { value: 0.02 },
+                uScale: { value: 8.0 },
+                cameraPosition: { value: this.camera.position.clone() }
             },
             vertexShader: volumetricVert,
             fragmentShader: volumetricFrag,
             transparent: true,
-            side: THREE.BackSide, // Render back faces for raymarching entrance
+            side: THREE.DoubleSide,
             blending: THREE.AdditiveBlending,
             depthWrite: false,
         });
