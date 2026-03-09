@@ -17,11 +17,10 @@ precision highp float;
 varying vec3 vWorldPosition;
 varying vec3 vLocalPosition;
 
-uniform vec3 cameraPosition;
 uniform float uTime;
-uniform int uN;
-uniform int uL;
-uniform int uM;
+uniform float uN;
+uniform float uL;
+uniform float uM;
 uniform float uOpacity;
 uniform float uStepSize;
 uniform float uScale;
@@ -98,19 +97,19 @@ vec2 getWavefunction(vec3 p) {
     float phi = atan(p.y, p.x);
     
     // Radial part
-    float rho = (2.0 * r) / float(uN);
-    float normR = sqrt(pow(2.0/float(uN), 3.0) * (factorial(uN - uL - 1) / (2.0 * float(uN) * factorial(uN + uL))));
-    float radial = normR * exp(-rho * 0.5) * pow(rho, float(uL)) * laguerre(uN - uL - 1, 2 * uL + 1, rho);
+    float rho = (2.0 * r) / uN;
+    float normR = sqrt(pow(2.0/uN, 3.0) * (factorial(int(uN) - int(uL) - 1) / (2.0 * uN * factorial(int(uN) + int(uL)))));
+    float radial = normR * exp(-rho * 0.5) * pow(rho, uL) * laguerre(int(uN) - int(uL) - 1, 2 * int(uL) + 1, rho);
     
     // Angular part
-    int absM = abs(uM);
-    float normY = sqrt(((float(2 * uL + 1) / (4.0 * PI)) * (factorial(uL - absM) / factorial(uL + absM))));
-    float legendre = associatedLegendre(uL, uM, costheta);
+    int absM = int(abs(uM));
+    float normY = sqrt((((2.0 * uL + 1.0) / (4.0 * PI)) * (factorial(int(uL) - absM) / factorial(int(uL) + absM))));
+    float legendre = associatedLegendre(int(uL), int(uM), costheta);
     
     float angularBase = normY * legendre;
-    if (uM > 0 && (uM % 2 != 0)) angularBase = -angularBase;
+    if (uM > 0.0 && (int(uM) % 2 != 0)) angularBase = -angularBase;
     
-    float phase = float(uM) * phi - uTime * (1.0 / pow(float(uN), 2.0));
+    float phase = uM * phi - uTime * (1.0 / pow(uN, 2.0));
     
     return radial * angularBase * vec2(cos(phase), sin(phase));
 }
@@ -135,7 +134,10 @@ void main() {
     vec3 rayStep = rayDir * uStepSize;
     vec3 rayLocalPos = vLocalPosition;
     
-    for(int i = 0; i < 128; i++) {
+    // Offset slightly inwards to pass the immediate surface boundary
+    rayLocalPos += rayStep * 0.1;
+    
+    for(int i = 0; i < 256; i++) {
         // Sample at current local position
         vec2 psi = getWavefunction(rayLocalPos);
         float prob = dot(psi, psi);
@@ -143,15 +145,15 @@ void main() {
         
         if (prob > 0.00001) {
             vec3 col = phaseToColor(phase);
-            float alpha = prob * uOpacity * 20.0; // Higher boost
-            finalColor.rgb += col * alpha;
+            float alpha = prob * uOpacity * 1000.0; // Compensated for uStepSize integration
+            finalColor.rgb += col * alpha * uStepSize; // Integrating over distance
             finalColor.a = 1.0;
         }
         
         rayLocalPos += rayStep;
         
-        // Exit if we leave the unit sphere
-        if (length(rayLocalPos) > 1.0) break;
+        // Exit if we leave the bounding sphere (geometry is radius 2)
+        if (length(rayLocalPos) > 2.0) break;
     }
     
     gl_FragColor = finalColor;
