@@ -36,8 +36,7 @@ export class WavefunctionVisualizer {
                 uM: { value: 0 },
                 uOpacity: { value: 0.8 },
                 uStepSize: { value: 0.02 },
-                uScale: { value: 8.0 },
-                cameraPosition: { value: this.camera.position.clone() }
+                uScale: { value: 8.0 }
             },
             vertexShader: volumetricVert,
             fragmentShader: volumetricFrag,
@@ -69,7 +68,10 @@ export class WavefunctionVisualizer {
 
     public updateUniforms(params: any) {
         Object.keys(params).forEach(key => {
-            if (this.material.uniforms[key]) {
+            const uniformKey = 'u' + key.charAt(0).toUpperCase() + key.slice(1);
+            if (this.material.uniforms[uniformKey]) {
+                this.material.uniforms[uniformKey].value = params[key];
+            } else if (this.material.uniforms[key]) {
                 this.material.uniforms[key].value = params[key];
             }
         });
@@ -80,7 +82,6 @@ export class WavefunctionVisualizer {
 
         const delta = this.clock.getElapsedTime();
         this.material.uniforms.uTime.value = delta;
-        this.material.uniforms.cameraPosition.value.copy(this.camera.position);
 
         this.controls.update();
         this.renderer.render(this.scene, this.camera);
